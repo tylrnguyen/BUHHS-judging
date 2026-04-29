@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react
 import Projects from './pages/Projects';
 import SubmitScore from './pages/SubmitScore';
 import Leaderboard from './pages/Leaderboard';
+import Login from './pages/Login';
+import { useState, useEffect } from 'react';
 
 const navigation = [
   { to: '/', label: 'Projects' },
@@ -43,6 +45,18 @@ const Shell = ({ children }) => {
 };
 
 const App = () => {
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem('auth') === 'true') {
+      setIsAuth(true);
+    }
+  }, []);
+
+  if (!isAuth) {
+    return <Login onLogin={() => setIsAuth(true)} />;
+  }
+
   return (
     <Router>
       <Shell>

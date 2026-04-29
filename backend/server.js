@@ -29,6 +29,16 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
 
+app.get('/api/projects', async (req, res) => {
+  try {
+    const projects = await Project.find();
+    res.json(projects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error fetching projects');
+  }
+});
+
 // get all projects
 app.post('/api/projects', async (req, res) => {
   try {
@@ -43,14 +53,26 @@ app.post('/api/projects', async (req, res) => {
 
 // Submit a score
 app.post('/api/scores', async (req, res) => {
-try {
-    const score = new Score(req.body); // Create a new score
-    await score.save(); // Save it to the database
+  try {
+    const { projectId, judgeName } = req.body;
+
+    const existing = await Score.findOne({ projectId, judgeName });
+
+    if (existing) {
+      // update instead of duplicate
+      Object.assign(existing, req.body);
+      await existing.save();
+      return res.json({ message: 'Score updated successfully!' });
+    }
+
+    const score = new Score(req.body);
+    await score.save();
+
     res.json({ message: 'Score submitted successfully!' });
-} catch (error) {
+  } catch (error) {
     console.error(error);
     res.status(500).send('Error saving score');
-}
+  }
 });
 
 // Calculate Top Results 

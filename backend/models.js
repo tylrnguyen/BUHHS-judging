@@ -15,6 +15,8 @@ const ScoreSchema = new mongoose.Schema({
     presentation: {type: Number, required: true},
 });
 
+ScoreSchema.index({ projectId: 1, judgeName: 1 }, { unique: true });
+
 const Project = mongoose.model('Project', ProjectSchema);
 const Score = mongoose.model('Score', ScoreSchema); 
 
