@@ -53,15 +53,33 @@ app.post('/api/projects', async (req, res) => {
 
 // Submit a score
 app.post('/api/scores', async (req, res) => {
+  console.log('[POST /api/scores] Incoming score request:', req.body);
+
   try {
-    const { projectId, judgeName } = req.body;
+    const { projectId, judgeName, fit, innovation, functionality, presentation } = req.body;
+
+    if (!projectId) {
+      console.warn('[POST /api/scores] Missing projectId');
+      return res.status(400).json({ message: 'Project is required.' });
+    }
+
+    if (!judgeName || typeof judgeName !== 'string' || !judgeName.trim()) {
+      console.warn('[POST /api/scores] Missing or invalid judgeName:', judgeName);
+      return res.status(400).json({ message: 'Judge name is required.' });
+    }
 
     const normalizedJudgeName = judgeName.trim().toLowerCase();
 
     const scoreData = {
-      ...req.body,
-      judgeName: normalizedJudgeName
+      projectId,
+      judgeName: normalizedJudgeName,
+      fit,
+      innovation,
+      functionality,
+      presentation
     };
+
+    console.log('[POST /api/scores] Normalized score data:', scoreData);
 
     const existing = await Score.findOne({
       projectId,
@@ -69,18 +87,41 @@ app.post('/api/scores', async (req, res) => {
     });
 
     if (existing) {
+      console.log('[POST /api/scores] Existing score found. Updating:', {
+        scoreId: existing._id,
+        projectId,
+        judgeName: normalizedJudgeName
+      });
+
       Object.assign(existing, scoreData);
       await existing.save();
+
+      console.log('[POST /api/scores] Score updated successfully:', existing._id);
       return res.json({ message: 'Score updated successfully!' });
     }
+
+    console.log('[POST /api/scores] No existing score found. Creating new score.');
 
     const score = new Score(scoreData);
     await score.save();
 
+    console.log('[POST /api/scores] Score submitted successfully:', score._id);
     res.json({ message: 'Score submitted successfully!' });
   } catch (error) {
-    console.error(error);
-    res.status(500).send('Error saving score');
+    console.error('[POST /api/scores] Error saving score:', {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      stack: error.stack
+    });
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        message: 'Duplicate score detected. Try refreshing and submitting again.'
+      });
+    }
+
+    res.status(500).json({ message: 'Error saving score' });
   }
 });
 

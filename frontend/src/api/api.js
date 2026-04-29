@@ -13,12 +13,21 @@ export const fetchProjects = async () => {
 };
 
 export const submitScore = async (scoreData) => {
+  console.log('[submitScore] Sending score data:', scoreData);
+
   try {
     const response = await axios.post(`${API_BASE_URL}/scores`, scoreData);
+    console.log('[submitScore] Backend response:', response.data);
     return response.data;
   } catch (error) {
-    console.error('Error submitting score:', error);
-    return { message: 'Error submitting score' };
+    console.error('[submitScore] Error submitting score:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data,
+      url: `${API_BASE_URL}/scores`
+    });
+
+    return error.response?.data || { message: 'Error submitting score' };
   }
 };
 
