@@ -1,5 +1,6 @@
-const {Project, Score} = require('./models'); 
+require('dotenv').config();
 
+const { Project, Score } = require('./models');
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -7,10 +8,20 @@ const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors());
+
+// CORS setup
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://tylern1228:lEXFuoqp9F57Cv40@cluster0.begmv.mongodb.net/cluster0?retryWrites=true&w=majority&appName=Cluster0')
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch((err) => console.error('MongoDB connection error', err));
 
@@ -19,16 +30,16 @@ db.on('error', console.error.bind(console, 'Connection error:'));
 db.once('open', () => console.log('Connected to MongoDB'));
 
 // get all projects
-app.get('/api/projects', async (req, res) => {
-    try {
-      const projects = await Project.find(); // Fetch all projects
-      console.log('Fetched projects from DB: ', projects); 
-      res.json(projects);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-      res.status(500).send('Error fetching projects');
-    }
-  });  
+app.post('/api/projects', async (req, res) => {
+  try {
+    const project = new Project(req.body);
+    await project.save();
+    res.status(201).json(project);
+  } catch (error) {
+    console.error('Error creating project:', error);
+    res.status(500).send('Error creating project');
+  }
+});
 
 // Submit a score
 app.post('/api/scores', async (req, res) => {
@@ -63,7 +74,11 @@ try {
     res.status(500).send('Error calculating results');
 }
 });
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
   
 // Start the server
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));

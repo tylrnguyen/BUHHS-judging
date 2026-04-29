@@ -16,18 +16,29 @@ const Leaderboard = () => {
   }, []);
 
   return (
-    <div>
-      <h1>Leaderboard</h1>
-      {results.map(entry => {
-        const project = projects.find(p => p._id === entry._id);
-        return project ? (
-          <div key={entry._id}>
-            <h2>{project.title}</h2>
-            <p>Total Score: {entry.totalScore}</p>
-          </div>
-        ) : null;
-      })}
-    </div>
+    <section className="page-section">
+      <div className="section-header">
+        <p className="section-kicker">Live results</p>
+        <h2>Leaderboard</h2>
+        <p>Top scores update here so judges can quickly compare the frontrunners.</p>
+      </div>
+
+      <div className="leaderboard-list">
+        {results.map((entry, index) => {
+          const project = projects.find((projectItem) => projectItem._id === entry._id);
+          return project ? (
+            <article key={entry._id} className="leaderboard-row">
+              <div className="rank-badge">{index + 1}</div>
+              <div className="leaderboard-content">
+                <h3>{project.title}</h3>
+                <p>{project.description}</p>
+              </div>
+              <div className="score-badge">{entry.totalScore}</div>
+            </article>
+          ) : null;
+        })}
+      </div>
+    </section>
   );
 };
 
