@@ -56,16 +56,25 @@ app.post('/api/scores', async (req, res) => {
   try {
     const { projectId, judgeName } = req.body;
 
-    const existing = await Score.findOne({ projectId, judgeName });
+    const normalizedJudgeName = judgeName.trim().toLowerCase();
+
+    const scoreData = {
+      ...req.body,
+      judgeName: normalizedJudgeName
+    };
+
+    const existing = await Score.findOne({
+      projectId,
+      judgeName: normalizedJudgeName
+    });
 
     if (existing) {
-      // update instead of duplicate
-      Object.assign(existing, req.body);
+      Object.assign(existing, scoreData);
       await existing.save();
       return res.json({ message: 'Score updated successfully!' });
     }
 
-    const score = new Score(req.body);
+    const score = new Score(scoreData);
     await score.save();
 
     res.json({ message: 'Score submitted successfully!' });
