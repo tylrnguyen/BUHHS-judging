@@ -1,9 +1,27 @@
 const mongoose = require('mongoose'); 
 
 const ProjectSchema = new mongoose.Schema({
-    title: { type: String, required: true}, 
-    description: {type: String, required: true},
-    team: [String],
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+
+  // Keeps your current frontend working
+  team: [String],
+
+  // Google Form fields
+  submitterEmail: String,
+  teamName: String,
+
+  members: [
+    {
+      name: String,
+      email: String
+    }
+  ],
+
+  submittedAt: {
+    type: Date,
+    default: Date.now
+  }
 });
 
 const ScoreSchema = new mongoose.Schema({

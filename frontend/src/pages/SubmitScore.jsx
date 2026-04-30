@@ -38,6 +38,16 @@ const SubmitScore = () => {
     }
   }, [projectId]);
 
+  useEffect(() => {
+  if (!message) return;
+
+  const timer = setTimeout(() => {
+    setMessage('');
+  }, 3000);
+
+  return () => clearTimeout(timer);
+  }, [message]);
+
   const selectedProjectData = useMemo(
     () => projects.find((project) => project._id === selectedProject),
     [projects, selectedProject]
@@ -117,6 +127,13 @@ const SubmitScore = () => {
                 </option>
               ))}
             </select>
+            <select
+            value={selectedProject}
+            onChange={(e) => {
+              setSelectedProject(e.target.value);
+    setMessage('');
+  }}
+></select>
           </label>
         </section>
       );

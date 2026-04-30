@@ -28,14 +28,34 @@ const Projects = () => {
               <h3>{project.title}</h3>
               <span className="pill">Team {project.team?.length || 0}</span>
             </div>
+
+            {project.submitterEmail && (
+              <p>
+                <strong>Submitter Email:</strong> {project.submitterEmail}
+              </p>
+            )}
+
             <p>{project.description}</p>
-            <div className="tag-row">
-              {project.team?.map((member) => (
-                <span key={member} className="tag">
-                  {member}
-                </span>
-              ))}
-            </div>
+
+            {project.members?.length > 0 ? (
+              <div className="tag-row">
+                {project.members.map((member) => (
+                  <span key={`${member.name}-${member.email}`} className="tag">
+                    {member.name}
+                    {member.email ? ` (${member.email})` : ''}
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <div className="tag-row">
+                {project.team?.map((member) => (
+                  <span key={member} className="tag">
+                    {member}
+                  </span>
+                ))}
+              </div>
+            )}
+
             <div className="project-actions">
               <Link to={`/submit-score/${project._id}`} className="button primary project-action">
                 Start survey
