@@ -119,21 +119,13 @@ const SubmitScore = () => {
           </div>
           <label className="field">
             <span>Project</span>
-            <select value={selectedProject} onChange={(e) => setSelectedProject(e.target.value)}>
-              <option value="">Select a project</option>
-              {projects.map((project) => (
-                <option key={project._id} value={project._id}>
-                  {project.title}
-                </option>
-              ))}
-            </select>
-            <select
-            value={selectedProject}
+            <select>
+              value={selectedProject}
             onChange={(e) => {
               setSelectedProject(e.target.value);
-    setMessage('');
-  }}
-></select>
+              setMessage('');
+            }}
+            </select>
           </label>
         </section>
       );
