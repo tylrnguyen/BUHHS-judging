@@ -642,3 +642,21 @@ button {
     border-radius: 22px;
   }
 }
+
+.leaderboard-stack {
+  display: grid;
+  gap: 28px;
+}
+
+.leaderboard-section {
+  display: grid;
+  gap: 14px;
+}
+
+.section-header.compact {
+  margin-bottom: 0;
+}
+
+.section-header.compact p:last-child {
+  margin: 6px 0 0;
+}

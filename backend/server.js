@@ -127,24 +127,49 @@ app.post('/api/scores', async (req, res) => {
 
 // Calculate Top Results 
 app.get('/api/results', async (req, res) => {
-try {
-    const results = await Score.aggregate([
-    {
+  try {
+    const getLeaderboard = async (scoreField, outputField = 'score') => {
+      return Score.aggregate([
+        {
+          $group: {
+            _id: '$projectId',
+            [outputField]: { $sum: `$${scoreField}` },
+            scoreCount: { $sum: 1 }
+          }
+        },
+        { $sort: { [outputField]: -1 } },
+        { $limit: 3 }
+      ]);
+    };
+
+    const overall = await Score.aggregate([
+      {
         $group: {
-        _id: '$projectId',
-        totalScore: {
-            $sum: { $add: ['$fit', '$innovation', '$functionality', '$presentation'] },
-        },
-        },
-    },
-    { $sort: { totalScore: -1 } }, // Sort by highest score
-    { $limit: 3 }, // Limit to top 3
+          _id: '$projectId',
+          totalScore: {
+            $sum: {
+              $add: ['$fit', '$innovation', '$functionality', '$presentation']
+            }
+          },
+          scoreCount: { $sum: 1 }
+        }
+      },
+      { $sort: { totalScore: -1 } },
+      { $limit: 3 }
     ]);
-    res.json(results);
-} catch (error) {
-    console.error(error);
-    res.status(500).send('Error calculating results');
-}
+
+    const presentation = await getLeaderboard('presentation', 'presentationScore');
+    const socialImpact = await getLeaderboard('fit', 'socialImpactScore');
+
+    res.json({
+      overall,
+      presentation,
+      socialImpact
+    });
+  } catch (error) {
+    console.error('[GET /api/results] Error calculating results:', error);
+    res.status(500).json({ message: 'Error calculating results' });
+  }
 });
 
 app.get('/api/health', (req, res) => {

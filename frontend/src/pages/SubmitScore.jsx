@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { fetchProjects, submitScore } from '../api/api';
 
 const criteria = [
-  { key: 'fit', label: 'Fit', hint: 'How well does this solve the stated problem?' },
+  {key: 'fit', label: 'Social Impact', hint: 'How meaningful is the project’s potential impact on people, communities, or society?'},
   { key: 'innovation', label: 'Innovation', hint: 'How original or creative is the approach?' },
   { key: 'functionality', label: 'Functionality', hint: 'How complete and reliable is the build?' },
   { key: 'presentation', label: 'Presentation', hint: 'How clearly is the project communicated?' },
