@@ -92,6 +92,14 @@ const SubmitScore = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (currentStep < stepTotal - 1) {
+      if (canAdvance) {
+        handleNext();
+      }
+      return;
+    }
+
     const scoreData = {
       projectId: selectedProject,
       judgeName,
@@ -100,6 +108,7 @@ const SubmitScore = () => {
       functionality,
       presentation,
     };
+
     const response = await submitScore(scoreData);
     setMessage(response.message);
     setCurrentStep(0);
@@ -119,12 +128,19 @@ const SubmitScore = () => {
           </div>
           <label className="field">
             <span>Project</span>
-            <select>
+            <select
               value={selectedProject}
-            onChange={(e) => {
-              setSelectedProject(e.target.value);
-              setMessage('');
-            }}
+              onChange={(e) => {
+                setSelectedProject(e.target.value);
+                setMessage('');
+              }}
+            >
+              <option value="">Select a project</option>
+              {projects.map((project) => (
+                <option key={project._id} value={project._id}>
+                  {project.title}
+                </option>
+              ))}
             </select>
           </label>
         </section>
@@ -214,7 +230,15 @@ const SubmitScore = () => {
   };
 
   return (
-    <form className="survey-layout qualtrics-style" onSubmit={handleSubmit}>
+    <form
+        className="survey-layout qualtrics-style"
+        onSubmit={handleSubmit}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && currentStep < stepTotal - 1) {
+            e.preventDefault();
+          }
+        }}
+      >
       <div className="survey-progress-header">
         <div className="progress-wrap" aria-label={`Progress ${progress}%`}>
           <div className="progress-track">
